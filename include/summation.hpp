@@ -27,7 +27,7 @@ method_0(sycl::queue& q,
           sycl::uint,
           sycl::ext::oneapi::memory_order::relaxed,
           sycl::ext::oneapi::memory_scope::device,
-          sycl::access::address_space::global_device_space>
+          sycl::access::address_space::ext_intel_global_device_space>
           out_ref{ *out };
         out_ref.fetch_add(*(in + idx));
         // atomically update global sum holder memory location with
