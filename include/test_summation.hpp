@@ -1,0 +1,64 @@
+#pragma once
+#include "summation.hpp"
+#include <random>
+
+namespace test_summation {
+void
+random_fill(sycl::uint* const in, size_t in_len)
+{
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<sycl::uint> dis(1u, 0xffffffffu);
+
+  for (size_t i = 0; i < in_len; i++) {
+    *(in + i) = dis(gen);
+  }
+}
+
+void
+seq_sum(const sycl::uint* in, size_t in_len, sycl::uint* const out)
+{
+  sycl::uint tmp = 0;
+  for (size_t i = 0; i < in_len; i++) {
+    tmp += *(in + i);
+  }
+  *out = tmp;
+}
+
+void
+method_0(sycl::queue& q, size_t in_len, size_t wg_size)
+{
+  sycl::uint* in_h =
+    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
+  sycl::uint* in_d = static_cast<sycl::uint*>(
+    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
+  sycl::uint* out_h =
+    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint), q));
+  sycl::uint* out_d =
+    static_cast<sycl::uint*>(sycl::malloc_device(sizeof(sycl::uint), q));
+
+  random_fill(in_h, in_len);
+
+  sycl::event evt_0 = q.memcpy(in_d, in_h, sizeof(sycl::uint) * in_len);
+  sycl::event evt_1 = q.memset(out_d, 0, sizeof(sycl::uint));
+  sycl::event evt_2 =
+    summation::method_0(q, in_d, in_len, out_d, wg_size, { evt_0, evt_1 });
+  sycl::event evt_3 = q.submit([&](sycl::handler& h) {
+    h.depends_on(evt_2);
+    h.memcpy(out_h, out_d, sizeof(sycl::uint));
+  });
+
+  evt_3.wait();
+
+  // device computed result to be compared against this
+  sycl::uint out_cmp = 0;
+  seq_sum(in_h, in_len, &out_cmp);
+
+  assert(*out_h == out_cmp);
+
+  sycl::free(in_h, q);
+  sycl::free(in_d, q);
+  sycl::free(out_h, q);
+  sycl::free(out_d, q);
+}
+}
