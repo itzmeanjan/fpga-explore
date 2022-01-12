@@ -157,4 +157,48 @@ method_2(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+
+sycl::cl_ulong
+method_3(sycl::queue& q, size_t in_len, size_t wg_size)
+{
+  sycl::uint* in_h =
+    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
+  sycl::uint* in_d = static_cast<sycl::uint*>(
+    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
+  sycl::uint* out_h =
+    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
+  sycl::uint* out_d = static_cast<sycl::uint*>(
+    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
+
+  random_fill(in_h, in_len);
+
+  sycl::event evt_0 = q.memcpy(in_d, in_h, sizeof(sycl::uint) * in_len);
+  std::vector<sycl::event> evts =
+    summation::method_3(q, in_d, in_len, out_d, in_len, wg_size, { evt_0 });
+  sycl::event evt_1 = q.submit([&](sycl::handler& h) {
+    h.depends_on(evts);
+    h.memcpy(out_h, out_d, sizeof(sycl::uint) * in_len);
+  });
+
+  evt_1.wait();
+
+  // device computed result to be compared against this
+  // host computed result
+  sycl::uint out_cmp = 0;
+  seq_sum(in_h, in_len, &out_cmp);
+
+  assert(*(out_h + 1) == out_cmp);
+
+  sycl::cl_ulong ts = 0;
+  for (auto evt : evts) {
+    ts += time_event(evt);
+  }
+
+  sycl::free(in_h, q);
+  sycl::free(in_d, q);
+  sycl::free(out_h, q);
+  sycl::free(out_d, q);
+
+  return ts;
+}
 }
