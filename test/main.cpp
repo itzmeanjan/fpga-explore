@@ -2,7 +2,7 @@
 #include "utils.hpp"
 #include <iostream>
 
-const size_t IN_LEN = 1 << 20;
+const size_t IN_LEN = 1 << 24;
 const size_t WG_SIZE = 1 << 5;
 
 int

@@ -154,6 +154,8 @@ method_2(sycl::queue& q, size_t in_len, size_t wg_size)
   sycl::free(in_d, q);
   sycl::free(out_h, q);
   sycl::free(out_d, q);
+  sycl::free(out_final_h, q);
+  sycl::free(out_final_d, q);
 
   return ts;
 }
