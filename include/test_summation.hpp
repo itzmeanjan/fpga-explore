@@ -201,4 +201,44 @@ method_3(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+
+sycl::cl_ulong
+method_4(sycl::queue& q, size_t in_len, size_t wg_size)
+{
+  sycl::uint* in_h =
+    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
+  sycl::uint* in_d = static_cast<sycl::uint*>(
+    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
+  sycl::uint* out_h =
+    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint), q));
+  sycl::uint* out_d =
+    static_cast<sycl::uint*>(sycl::malloc_device(sizeof(sycl::uint), q));
+
+  random_fill(in_h, in_len);
+
+  sycl::event evt_0 = q.memcpy(in_d, in_h, sizeof(sycl::uint) * in_len);
+  sycl::event evt_1 = summation::method_4(q, in_d, in_len, out_d, { evt_0 });
+  sycl::event evt_2 = q.submit([&](sycl::handler& h) {
+    h.depends_on(evt_1);
+    h.memcpy(out_h, out_d, sizeof(sycl::uint));
+  });
+
+  evt_2.wait();
+
+  // device computed result to be compared against this
+  // host computed result
+  sycl::uint out_cmp = 0;
+  seq_sum(in_h, in_len, &out_cmp);
+
+  assert(*out_h == out_cmp);
+
+  sycl::cl_ulong ts = time_event(evt_1);
+
+  sycl::free(in_h, q);
+  sycl::free(in_d, q);
+  sycl::free(out_h, q);
+  sycl::free(out_d, q);
+
+  return ts;
+}
 }
