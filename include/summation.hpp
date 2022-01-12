@@ -247,7 +247,7 @@ method_3(sycl::queue& q,
             const size_t in_offset = (out_offset << 1) + (idx << 1);
 
             *(out + out_offset + idx) =
-              *(in + in_offset) + *(in + in_offset + 1);
+              *(out + in_offset) + *(out + in_offset + 1);
           });
       });
 
