@@ -1,5 +1,6 @@
 #pragma once
 #include "summation.hpp"
+#include "utils.hpp"
 #include <random>
 
 namespace test_summation {
@@ -25,7 +26,7 @@ seq_sum(const sycl::uint* in, size_t in_len, sycl::uint* const out)
   *out = tmp;
 }
 
-void
+sycl::cl_ulong
 method_0(sycl::queue& q, size_t in_len, size_t wg_size)
 {
   sycl::uint* in_h =
@@ -56,9 +57,13 @@ method_0(sycl::queue& q, size_t in_len, size_t wg_size)
 
   assert(*out_h == out_cmp);
 
+  sycl::cl_ulong ts = time_event(evt_2);
+
   sycl::free(in_h, q);
   sycl::free(in_d, q);
   sycl::free(out_h, q);
   sycl::free(out_d, q);
+
+  return ts;
 }
 }

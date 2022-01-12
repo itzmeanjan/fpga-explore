@@ -20,7 +20,25 @@ make_queue(void** wq)
 
   sycl::device d{ d_sel };
   sycl::context c{ d };
-  sycl::queue* q = new sycl::queue{ c, d };
+  // enabling profiling is required for timing execution of job(s)
+  // using SYCL events
+  sycl::queue* q =
+    new sycl::queue{ c, d, sycl::property::queue::enable_profiling{} };
 
   *wq = q;
+}
+
+// Execution time of submitted job with nanosecond
+// level of granularity
+//
+// Ensure that queue has profiling enabled !
+sycl::cl_ulong
+time_event(sycl::event evt)
+{
+  sycl::cl_ulong start =
+    evt.get_profiling_info<sycl::info::event_profiling::command_start>();
+  sycl::cl_ulong end =
+    evt.get_profiling_info<sycl::info::event_profiling::command_end>();
+
+  return (end - start);
 }
