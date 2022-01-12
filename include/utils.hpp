@@ -19,10 +19,13 @@ make_queue(void** wq)
 #elif defined(TARGET_FPGA)
   sycl::ext::intel::fpga_selector d_sel{};
 #pragma message("Using SYCL fpga_selector; see `include/utils.hpp` for options")
-#else
+#elif defined(TARGET_DEFAULT)
   sycl::default_selector d_sel{};
 #pragma message(                                                               \
   "Using SYCL default_selector; see `include/utils.hpp` for options")
+#else
+  sycl::host_selector d_sel{};
+#pragma message("Using SYCL host_selector; see `include/utils.hpp` for options")
 #endif
 
   sycl::device d{ d_sel };
