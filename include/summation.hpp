@@ -122,8 +122,9 @@ method_2(sycl::queue& q,
   const size_t rev_wg_size =
     wg_size <= total_work_items ? wg_size : total_work_items;
 
-  // each work-group local summation is stored in output allocation
-  assert(out_len == in_len / rev_wg_size);
+  // each work-group local summation is stored in unique memory location
+  // of output allocation
+  assert(out_len == total_work_items / rev_wg_size);
 
   return q.submit([&](sycl::handler& h) {
     sycl::accessor<sycl::uint,
