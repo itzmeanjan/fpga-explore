@@ -28,5 +28,11 @@ main(int argc, char** argv)
               << "in " << (double)ts * 1e-6 << " ms" << std::endl;
   }
 
+  {
+    sycl::cl_ulong ts = test_summation::method_2(*q, IN_LEN, WG_SIZE);
+    std::cout << "passed summation ( method_2 ) test\t\t"
+              << "in " << (double)ts * 1e-6 << " ms" << std::endl;
+  }
+
   return 0;
 }
