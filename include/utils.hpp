@@ -8,14 +8,21 @@ make_queue(void** wq)
 
 #if defined(TARGET_CPU)
   sycl::cpu_selector d_sel{};
+#pragma message("Using SYCL cpu_selector; see `include/utils.hpp` for options")
 #elif defined(TARGET_GPU)
   sycl::gpu_selector d_sel{};
+#pragma message("Using SYCL gpu_selector; see `include/utils.hpp` for options")
 #elif defined(TARGET_FPGA_EMU)
   sycl::ext::intel::fpga_emulator_selector d_sel{};
+#pragma message(                                                               \
+  "Using SYCL fpga_emulator_selector; see `include/utils.hpp` for options")
 #elif defined(TARGET_FPGA)
   sycl::ext::intel::fpga_selector d_sel{};
+#pragma message("Using SYCL fpga_selector; see `include/utils.hpp` for options")
 #else
   sycl::default_selector d_sel{};
+#pragma message(                                                               \
+  "Using SYCL default_selector; see `include/utils.hpp` for options")
 #endif
 
   sycl::device d{ d_sel };
