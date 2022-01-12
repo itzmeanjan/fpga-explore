@@ -101,12 +101,13 @@ method_1(sycl::queue& q,
   });
 }
 
-sycl::event
+std::vector<sycl::event>
 method_2(sycl::queue& q,
          const sycl::uint* in,
          size_t in_len,
-         sycl::uint* const out,
-         size_t out_len,
+         sycl::uint* const out_itmd,
+         size_t out_itmd_len,
+         sycl::uint* const out_final,
          size_t wg_size,
          std::vector<sycl::event> evts)
 {
@@ -124,9 +125,9 @@ method_2(sycl::queue& q,
 
   // each work-group local summation is stored in unique memory location
   // of output allocation
-  assert(out_len == total_work_items / rev_wg_size);
+  assert(out_itmd_len == total_work_items / rev_wg_size);
 
-  return q.submit([&](sycl::handler& h) {
+  sycl::event evt_0 = q.submit([&](sycl::handler& h) {
     sycl::accessor<sycl::uint,
                    1,
                    sycl::access_mode::read_write,
@@ -134,13 +135,13 @@ method_2(sycl::queue& q,
       scratch{ sycl::range<1>{ rev_wg_size }, h };
 
     h.depends_on(evts);
-    h.parallel_for<class kernelSummationMethod2>(
+    h.parallel_for<class kernelSummationMethod2Phase0>(
       sycl::nd_range<1>{ sycl::range<1>{ total_work_items },
                          sycl::range<1>{ rev_wg_size } },
       [=](sycl::nd_item<1> it) {
         const size_t glb_idx = it.get_global_linear_id();
         const size_t loc_idx = it.get_local_linear_id();
-        const size_t wg_size = it.get_group_range(0);
+        const size_t wg_size = it.get_group().get_local_range(0);
         const size_t wg_idx = it.get_group().get_linear_id();
 
         sycl::group<1> grp = it.get_group();
@@ -162,9 +163,25 @@ method_2(sycl::queue& q,
         }
 
         if (loc_idx == 0) {
-          *(out + wg_idx) = scratch[0];
+          *(out_itmd + wg_idx) = scratch[0];
         }
       });
   });
+
+  // finally work-group local sums are added together (sequentially)
+  // to find whole sum of set
+  sycl::event evt_1 = q.submit([&](sycl::handler& h) {
+    h.depends_on(evt_0);
+    h.single_task<class kernelSummationMethod2Phase1>([=]() {
+      sycl::uint tmp = 0;
+      for (size_t i = 0; i < out_itmd_len; i++) {
+        tmp += *(out_itmd + i);
+      }
+
+      *out_final = tmp;
+    });
+  });
+
+  return { evt_0, evt_1 };
 }
 }
