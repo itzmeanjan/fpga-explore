@@ -35,12 +35,12 @@ method_3(sycl::queue& q,
       sycl::uint4 c;
 
       for (size_t i = 0; i < upto; i++) {
-        a.load(i << 2, in_a_ptr);
-        b.load(i << 2, in_b_ptr);
+        a.load(i, in_a_ptr);
+        b.load(i, in_b_ptr);
 
         c = a * b;
 
-        tmp += c.x() + c.y() + c.z() + c.w();
+        tmp += (c.x() + c.y() + c.z() + c.w());
       }
 
       *out = tmp;
