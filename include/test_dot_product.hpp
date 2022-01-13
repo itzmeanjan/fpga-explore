@@ -4,6 +4,9 @@
 #if defined(dot_product_method_0)
 #include "dot_product/method_0.hpp"
 #pragma message("Compiling dot product method_0 kernel")
+#elif defined(dot_product_method_1)
+#include "dot_product/method_1.hpp"
+#pragma message("Compiling dot product method_1 kernel")
 #else
 #pragma message(                                                               \
   "Specify which kernel(s) to compile, when invoking `make` utility")
@@ -27,9 +30,15 @@ seq_dot_product(const sycl::uint* in_a,
   *out = tmp;
 }
 
-#if defined(dot_product_method_0)
+#if defined(dot_product_method_0) || defined(dot_product_method_1)
+
 sycl::cl_ulong
-method_0(sycl::queue& q, size_t in_len, size_t wg_size)
+#if defined(dot_product_method_0)
+method_0
+#elif defined(dot_product_method_1)
+method_1
+#endif
+  (sycl::queue& q, size_t in_len, size_t wg_size)
 {
   sycl::uint* in_a_h =
     static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
@@ -50,8 +59,21 @@ method_0(sycl::queue& q, size_t in_len, size_t wg_size)
   sycl::event evt_0 = q.memcpy(in_a_d, in_a_h, sizeof(sycl::uint) * in_len);
   sycl::event evt_1 = q.memcpy(in_b_d, in_b_h, sizeof(sycl::uint) * in_len);
   sycl::event evt_2 = q.memset(out_d, 0, sizeof(sycl::uint));
-  sycl::event evt_3 = dot_product::method_0(
-    q, in_a_d, in_len, in_b_d, in_len, out_d, wg_size, { evt_0, evt_1, evt_2 });
+
+  sycl::event evt_3 = dot_product::
+#if defined(dot_product_method_0)
+    method_0
+#elif defined(dot_product_method_1)
+    method_1
+#endif
+    (q,
+     in_a_d,
+     in_len,
+     in_b_d,
+     in_len,
+     out_d,
+     wg_size,
+     { evt_0, evt_1, evt_2 });
   sycl::event evt_4 = q.submit([&](sycl::handler& h) {
     h.depends_on(evt_3);
     h.memcpy(out_h, out_d, sizeof(sycl::uint));
@@ -76,6 +98,7 @@ method_0(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+
 #endif
 
 }
