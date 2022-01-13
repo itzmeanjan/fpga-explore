@@ -3,6 +3,9 @@ CXXFLAGS = -std=c++20 -Wall
 SYCLFLAGS = -fsycl
 SYCLCUDAFLAGS = -fsycl -fsycl-targets=nvptx64-nvidia-cuda
 INCLUDES = -I./include
+
+# I suggest seeing https://github.com/itzmeanjan/fpga-explore/blob/434e9ff/include/utils.hpp#L9-L29
+# for understanding possibilities
 TARGETFLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 
 all: test
