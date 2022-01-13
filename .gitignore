@@ -1,4 +1,7 @@
 .vscode
 a.out
+fpga_emu.out
+fpga_opt.a
+fpga_hw.out
 *.o
-a.prj
+fpga_opt.prj

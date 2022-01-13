@@ -4,7 +4,8 @@ SYCL_FLAGS = -fsycl
 SYCL_CUDA_FLAGS = -fsycl -fsycl-targets=nvptx64-nvidia-cuda
 INCLUDES = -I./include
 SYCL_FPGA_EMU_FLAGS = -DTARGET_FPGA_EMU -fintelfpga
-SYCL_FPGA_FLAGS = -DTARGET_FPGA -fintelfpga -fsycl-link=early -Xshardware
+SYCL_FPGA_OPT_FLAGS = -DTARGET_FPGA -fintelfpga -fsycl-link=early -Xshardware
+SYCL_FPGA_HW_FLAGS = -DTARGET_FPGA -fintelfpga -Xshardware -Xsprofile
 
 # I suggest seeing https://github.com/itzmeanjan/fpga-explore/blob/434e9ff/include/utils.hpp#L9-L29
 # for understanding possibilities
@@ -28,6 +29,9 @@ TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 # - summation_method_3
 # - summation_method_4
 # - dot_product_method_0
+# - dot_product_method_1
+# - dot_product_method_2
+# - dot_product_method_3
 #
 # You want to specify it when invoking make as `$ TARGET_KERNEL=summation_method_0 make`
 TARGET_KERNEL_FLAGS = -D$(shell echo $(or $(TARGET_KERNEL),place_holder))
@@ -41,17 +45,28 @@ test/a.out: test/main.cpp include/*.hpp
 	$(CXX) $(CXX_FLAGS) $(SYCL_FLAGS) $(TARGET_FLAGS) $(TARGET_KERNEL_FLAGS) $(INCLUDES) $< -o $@
 
 fpga_emu_test:
-	$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_EMU_FLAGS) test/main.cpp -o test/a.out
-
-fpga_test:
 	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
-		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_FLAGS)  test/main.cpp -o test/a.out; \
+		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_EMU_FLAGS)  test/main.cpp -o test/fpga_emu.out; \
+	else \
+		echo "Must select kernel !"; \
+	fi
+
+fpga_opt_test:
+	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
+		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_OPT_FLAGS)  test/main.cpp -o test/fpga_opt.a; \
+	else \
+		echo "Must select kernel !"; \
+	fi
+
+fpga_hw_test:
+	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
+		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_HW_FLAGS)  test/main.cpp -o test/fpga_hw.out; \
 	else \
 		echo "Must select kernel !"; \
 	fi
 
 clean:
-	find . -name 'a.out' -o -name '*.o' -o -name '*.prj' | xargs rm -rf
+	find . -name '*.out' -o -name '*.o' -o -name '*.prj' -o -name '*.a' | xargs rm -rf
 
 format:
 	find . -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i --style=Mozilla
