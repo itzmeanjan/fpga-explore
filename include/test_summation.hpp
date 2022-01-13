@@ -1,6 +1,5 @@
 #pragma once
 #include "utils.hpp"
-#include <random>
 
 #if defined(summation_method_0)
 #include "summation/method_0.hpp"
@@ -23,18 +22,6 @@
 #endif
 
 namespace test_summation {
-void
-random_fill(sycl::uint* const in, size_t in_len)
-{
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<sycl::uint> dis(1u, 0xffffffffu);
-
-  for (size_t i = 0; i < in_len; i++) {
-    *(in + i) = dis(gen);
-  }
-}
-
 void
 seq_sum(const sycl::uint* in, size_t in_len, sycl::uint* const out)
 {
