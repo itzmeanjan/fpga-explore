@@ -19,14 +19,16 @@ method_4(sycl::queue& q,
     h.depends_on(evts);
 
     // single work-item kernel
-    h.single_task<kernelSummationMethod4>([=]() {
-      sycl::uint tmp = 0;
+    h.single_task<kernelSummationMethod4>([=
+    ]() [[intel::kernel_args_restrict]] {
+      [[intel::fpga_register]] sycl::uint tmp[4] = { 0, 0, 0, 0 };
 
+#pragma unroll 4
       for (size_t i = 0; i < in_len; i++) {
-        tmp += *(in + i);
+        tmp[i % 4] += *(in + i);
       }
 
-      *out = tmp;
+      *out = tmp[0] + tmp[1] + tmp[2] + tmp[3];
     });
   });
 }
