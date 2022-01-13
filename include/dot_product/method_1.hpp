@@ -3,6 +3,8 @@
 #include <cassert>
 
 namespace dot_product {
+class kernelDotProductMethod1;
+
 sycl::event
 method_1(sycl::queue& q,
          const sycl::uint* in_a,
@@ -27,7 +29,7 @@ method_1(sycl::queue& q,
       scratch{ sycl::range<1>{ 1 }, h };
     h.depends_on(evts);
 
-    h.parallel_for<class kernelDotProductMethod1>(
+    h.parallel_for<kernelDotProductMethod1>(
       sycl::nd_range<1>{ sycl::range<1>{ in_a_len },
                          sycl::range<1>{ wg_size } },
       [=](sycl::nd_item<1> it) {

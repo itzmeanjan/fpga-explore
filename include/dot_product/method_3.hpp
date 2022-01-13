@@ -16,6 +16,8 @@
 #endif
 
 namespace dot_product {
+class kernelDotProductMethod3;
+
 sycl::event
 method_3(sycl::queue& q,
          sycl::uint* in_a,
@@ -35,7 +37,7 @@ method_3(sycl::queue& q,
   return q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
 
-    h.single_task<class kernelDotProductMethod3>([=]() {
+    h.single_task<kernelDotProductMethod3>([=]() {
       const size_t upto = in_a_len >> VECTOR_WIDTH_LOG2;
 
       sycl::global_ptr<sycl::uint> in_a_ptr{ in_a };

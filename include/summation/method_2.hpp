@@ -3,6 +3,9 @@
 #include <cassert>
 
 namespace summation {
+class kernelSummationMethod2Phase0;
+class kernelSummationMethod2Phase1;
+
 std::vector<sycl::event>
 method_2(sycl::queue& q,
          const sycl::uint* in,
@@ -37,7 +40,7 @@ method_2(sycl::queue& q,
       scratch{ sycl::range<1>{ rev_wg_size }, h };
 
     h.depends_on(evts);
-    h.parallel_for<class kernelSummationMethod2Phase0>(
+    h.parallel_for<kernelSummationMethod2Phase0>(
       sycl::nd_range<1>{ sycl::range<1>{ total_work_items },
                          sycl::range<1>{ rev_wg_size } },
       [=](sycl::nd_item<1> it) {
@@ -74,7 +77,7 @@ method_2(sycl::queue& q,
   // to find whole sum of set
   sycl::event evt_1 = q.submit([&](sycl::handler& h) {
     h.depends_on(evt_0);
-    h.single_task<class kernelSummationMethod2Phase1>([=]() {
+    h.single_task<kernelSummationMethod2Phase1>([=]() {
       sycl::uint tmp = 0;
       for (size_t i = 0; i < out_itmd_len; i++) {
         tmp += *(out_itmd + i);

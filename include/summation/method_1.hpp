@@ -3,6 +3,8 @@
 #include <cassert>
 
 namespace summation {
+class kernelSummationMethod1;
+
 sycl::event
 method_1(sycl::queue& q,
          const sycl::uint* in,
@@ -23,7 +25,7 @@ method_1(sycl::queue& q,
                    sycl::access::target::local>
       scratch{ sycl::range<1>{ 1 }, h };
 
-    h.parallel_for<class kernelSummationMethod1>(
+    h.parallel_for<kernelSummationMethod1>(
       sycl::nd_range<1>{ sycl::range<1>{ in_len }, sycl::range<1>{ wg_size } },
       [=](sycl::nd_item<1> it) {
         const size_t glb_idx = it.get_global_linear_id();

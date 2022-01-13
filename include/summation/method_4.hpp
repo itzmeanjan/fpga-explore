@@ -3,6 +3,8 @@
 #include <cassert>
 
 namespace summation {
+class kernelSummationMethod4;
+
 sycl::event
 method_4(sycl::queue& q,
          const sycl::uint* in,
@@ -17,7 +19,7 @@ method_4(sycl::queue& q,
     h.depends_on(evts);
 
     // single work-item kernel
-    h.single_task<class kernelSummationMethod4>([=]() {
+    h.single_task<kernelSummationMethod4>([=]() {
       sycl::uint tmp = 0;
 
       for (size_t i = 0; i < in_len; i++) {

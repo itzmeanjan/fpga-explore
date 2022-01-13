@@ -3,6 +3,9 @@
 #include <cassert>
 
 namespace summation {
+class kernelSummationMethod3Phase0;
+class kernelSummationMethod3Phase1;
+
 std::vector<sycl::event>
 method_3(sycl::queue& q,
          const sycl::uint* in,
@@ -29,7 +32,7 @@ method_3(sycl::queue& q,
   sycl::event evt_0 = q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
 
-    h.parallel_for<class kernelSummationMethod3Phase0>(
+    h.parallel_for<kernelSummationMethod3Phase0>(
       sycl::nd_range<1>{ sycl::range<1>{ total_work_items },
                          sycl::range<1>{ rev_wg_size } },
       [=](sycl::nd_item<1> it) {
@@ -57,7 +60,7 @@ method_3(sycl::queue& q,
         const size_t rev_wg_size = wg_size <= req_wi_cnt ? wg_size : req_wi_cnt;
         const size_t out_offset = req_wi_cnt;
 
-        h.parallel_for<class kernelSummationMethod3Phase1>(
+        h.parallel_for<kernelSummationMethod3Phase1>(
           sycl::nd_range<1>{ sycl::range<1>{ req_wi_cnt },
                              sycl::range<1>{ rev_wg_size } },
           [=](sycl::nd_item<1> it) {

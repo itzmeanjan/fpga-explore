@@ -3,6 +3,8 @@
 #include <cassert>
 
 namespace dot_product {
+class kernelDotProductMethod2;
+
 sycl::event
 method_2(sycl::queue& q,
          const sycl::uint* in_a,
@@ -18,7 +20,7 @@ method_2(sycl::queue& q,
   return q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
 
-    h.single_task<class kernelDotProductMethod2>([=]() {
+    h.single_task<kernelDotProductMethod2>([=]() {
       sycl::uint tmp = 0;
       for (size_t i = 0; i < in_a_len; i++) {
         tmp += *(in_a + i) * *(in_b + i);
