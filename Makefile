@@ -27,6 +27,7 @@ TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 # - summation_method_2
 # - summation_method_3
 # - summation_method_4
+# - dot_product_method_0
 #
 # You want to specify it when invoking make as `$ TARGET_KERNEL=summation_method_0 make`
 TARGET_KERNEL_FLAGS = -D$(shell echo $(or $(TARGET_KERNEL),place_holder))
