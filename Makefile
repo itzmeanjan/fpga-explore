@@ -50,7 +50,7 @@ fpga_test:
 	fi
 
 clean:
-	find . -name 'a.out' -o -name '*.o' | xargs rm -f
+	find . -name 'a.out' -o -name '*.o' -o -name '*.prj' | xargs rm -rf
 
 format:
 	find . -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i --style=Mozilla
