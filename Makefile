@@ -3,6 +3,8 @@ CXX_FLAGS = -std=c++20 -Wall
 SYCL_FLAGS = -fsycl
 SYCL_CUDA_FLAGS = -fsycl -fsycl-targets=nvptx64-nvidia-cuda
 INCLUDES = -I./include
+SYCL_FPGA_EMU_FLAGS = -DTARGET_FPGA_EMU -fintelfpga
+SYCL_FPGA_FLAGS = -DTARGET_FPGA -fintelfpga -fsycl-link=early -Xshardware
 
 # I suggest seeing https://github.com/itzmeanjan/fpga-explore/blob/434e9ff/include/utils.hpp#L9-L29
 # for understanding possibilities
@@ -36,6 +38,16 @@ test: test/a.out
 
 test/a.out: test/main.cpp include/*.hpp
 	$(CXX) $(CXX_FLAGS) $(SYCL_FLAGS) $(TARGET_FLAGS) $(TARGET_KERNEL_FLAGS) $(INCLUDES) $< -o $@
+
+fpga_emu_test:
+	$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_EMU_FLAGS) test/main.cpp -o test/a.out
+
+fpga_test:
+	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
+		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_FLAGS)  test/main.cpp -o test/a.out; \
+	else \
+		echo "Must select kernel !"; \
+	fi
 
 clean:
 	find . -name 'a.out' -o -name '*.o' | xargs rm -f
