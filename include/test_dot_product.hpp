@@ -7,6 +7,9 @@
 #elif defined(dot_product_method_1)
 #include "dot_product/method_1.hpp"
 #pragma message("Compiling dot product method_1 kernel")
+#elif defined(dot_product_method_2)
+#include "dot_product/method_2.hpp"
+#pragma message("Compiling dot product method_2 kernel")
 #else
 #pragma message(                                                               \
   "Specify which kernel(s) to compile, when invoking `make` utility")
@@ -30,13 +33,16 @@ seq_dot_product(const sycl::uint* in_a,
   *out = tmp;
 }
 
-#if defined(dot_product_method_0) || defined(dot_product_method_1)
+#if defined(dot_product_method_0) || defined(dot_product_method_1) ||          \
+  defined(dot_product_method_2)
 
 sycl::cl_ulong
 #if defined(dot_product_method_0)
 method_0
 #elif defined(dot_product_method_1)
 method_1
+#elif defined(dot_product_method_2)
+method_2
 #endif
   (sycl::queue& q, size_t in_len, size_t wg_size)
 {
@@ -65,6 +71,8 @@ method_1
     method_0
 #elif defined(dot_product_method_1)
     method_1
+#elif defined(dot_product_method_2)
+    method_2
 #endif
     (q,
      in_a_d,
@@ -72,7 +80,9 @@ method_1
      in_b_d,
      in_len,
      out_d,
+#if defined(dot_product_method_0) || defined(dot_product_method_1)
      wg_size,
+#endif
      { evt_0, evt_1, evt_2 });
   sycl::event evt_4 = q.submit([&](sycl::handler& h) {
     h.depends_on(evt_3);
