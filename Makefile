@@ -47,6 +47,7 @@ test/a.out: test/main.cpp include/*.hpp
 fpga_emu_test:
 	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
 		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_EMU_FLAGS)  test/main.cpp -o test/fpga_emu.out; \
+		./test/fpga_emu.out; \
 	else \
 		echo "Must select kernel !"; \
 	fi
