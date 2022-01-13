@@ -15,8 +15,7 @@ INCLUDES = -I./include
 # - fpga
 # - default
 #
-# You probably want to specify it when invoking make utility as
-# `TARGET=fpga_emu make`
+# You probably want to specify it when invoking make utility as `$ TARGET=fpga_emu make`
 TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 
 # Possible values for TARGET_KERNEL 
@@ -27,7 +26,7 @@ TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 # - summation_method_3
 # - summation_method_4
 #
-# You want to specify it when invoking make as `TARGET_KERNEL=summation_method_0 make`
+# You want to specify it when invoking make as `$ TARGET_KERNEL=summation_method_0 make`
 TARGET_KERNEL_FLAGS = -D$(shell echo $(or $(TARGET_KERNEL),place_holder))
 
 all: test
