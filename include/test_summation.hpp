@@ -1,7 +1,26 @@
 #pragma once
-#include "summation.hpp"
 #include "utils.hpp"
 #include <random>
+
+#if defined(summation_method_0)
+#include "summation/method_0.hpp"
+#pragma message("Compiling summation method_0 kernel")
+#elif defined(summation_method_1)
+#include "summation/method_1.hpp"
+#pragma message("Compiling summation method_1 kernel")
+#elif defined(summation_method_2)
+#include "summation/method_2.hpp"
+#pragma message("Compiling summation method_2 kernel")
+#elif defined(summation_method_3)
+#include "summation/method_3.hpp"
+#pragma message("Compiling summation method_3 kernel")
+#elif defined(summation_method_4)
+#include "summation/method_4.hpp"
+#pragma message("Compiling summation method_4 kernel")
+#else
+#pragma message(                                                               \
+  "Specify which kernel(s) to compile, when invoking `make` utility")
+#endif
 
 namespace test_summation {
 void
@@ -26,6 +45,7 @@ seq_sum(const sycl::uint* in, size_t in_len, sycl::uint* const out)
   *out = tmp;
 }
 
+#if defined(summation_method_0)
 sycl::cl_ulong
 method_0(sycl::queue& q, size_t in_len, size_t wg_size)
 {
@@ -66,7 +86,9 @@ method_0(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+#endif
 
+#if defined(summation_method_1)
 sycl::cl_ulong
 method_1(sycl::queue& q, size_t in_len, size_t wg_size)
 {
@@ -107,7 +129,9 @@ method_1(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+#endif
 
+#if defined(summation_method_2)
 sycl::cl_ulong
 method_2(sycl::queue& q, size_t in_len, size_t wg_size)
 {
@@ -159,7 +183,9 @@ method_2(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+#endif
 
+#if defined(summation_method_3)
 sycl::cl_ulong
 method_3(sycl::queue& q, size_t in_len, size_t wg_size)
 {
@@ -203,7 +229,9 @@ method_3(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+#endif
 
+#if defined(summation_method_4)
 sycl::cl_ulong
 method_4(sycl::queue& q, size_t in_len, size_t wg_size)
 {
@@ -243,4 +271,5 @@ method_4(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+#endif
 }
