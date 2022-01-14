@@ -28,19 +28,20 @@ method_2(sycl::queue& q,
       sycl::device_ptr<sycl::uint> in_b_ptr{ in_b };
       sycl::device_ptr<sycl::uint> out_ptr{ out };
 
-      [[intel::fpga_register]] sycl::uint tmp[4];
+      [[intel::fpga_register]] sycl::uint tmp[8];
 
-#pragma unroll 4 // fully unrolled loop
-      for (size_t i = 0; i < 4; i++) {
+#pragma unroll 8 // fully unrolled loop
+      for (size_t i = 0; i < 8; i++) {
         tmp[i] = 0;
       }
 
-#pragma unroll 4 // partially unrolled loop
+#pragma unroll 8 // partially unrolled loop
       for (size_t i = 0; i < in_a_len; i++) {
-        tmp[i % 4] += in_a_ptr[i] * in_b_ptr[i];
+        tmp[i % 8] += in_a_ptr[i] * in_b_ptr[i];
       }
 
-      out_ptr[0] = tmp[0] + tmp[1] + tmp[2] + tmp[3];
+      out_ptr[0] =
+        tmp[0] + tmp[1] + tmp[2] + tmp[3] + tmp[4] + tmp[5] + tmp[6] + tmp[7];
     });
   });
 }
