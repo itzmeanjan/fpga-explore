@@ -1,5 +1,6 @@
 #pragma once
 #include <CL/sycl.hpp>
+#include <random>
 #include <sycl/ext/intel/fpga_extensions.hpp>
 
 void
@@ -51,4 +52,16 @@ time_event(sycl::event evt)
     evt.get_profiling_info<sycl::info::event_profiling::command_end>();
 
   return (end - start);
+}
+
+void
+random_fill(sycl::uint* const in, size_t in_len)
+{
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<sycl::uint> dis(1u, 0xffffffffu);
+
+  for (size_t i = 0; i < in_len; i++) {
+    *(in + i) = dis(gen);
+  }
 }
