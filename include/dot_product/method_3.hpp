@@ -48,33 +48,33 @@ method_3(sycl::queue& q,
 
       sycl::uint tmp = 0;
 
+      for (size_t i = 0; i < upto; i++) {
 #if VECTOR_WIDTH == 2
 #pragma message("Using vector width 2 for dot_product::method_3 kernel")
 
-      sycl::uint2 a;
-      sycl::uint2 b;
-      sycl::uint2 c;
+        sycl::uint2 a;
+        sycl::uint2 b;
+        sycl::uint2 c;
 #elif VECTOR_WIDTH == 4
 #pragma message("Using vector width 4 for dot_product::method_3 kernel")
 
-      sycl::uint4 a;
-      sycl::uint4 b;
-      sycl::uint4 c;
+        sycl::uint4 a;
+        sycl::uint4 b;
+        sycl::uint4 c;
 #elif VECTOR_WIDTH == 8
 #pragma message("Using vector width 8 for dot_product::method_3 kernel")
 
-      sycl::uint8 a;
-      sycl::uint8 b;
-      sycl::uint8 c;
+        sycl::uint8 a;
+        sycl::uint8 b;
+        sycl::uint8 c;
 #elif VECTOR_WIDTH == 16
 #pragma message("Using vector width 16 for dot_product::method_3 kernel")
 
-      sycl::uint16 a;
-      sycl::uint16 b;
-      sycl::uint16 c;
+        sycl::uint16 a;
+        sycl::uint16 b;
+        sycl::uint16 c;
 #endif
 
-      for (size_t i = 0; i < upto; i++) {
         a.load(i, in_a_ptr);
         b.load(i, in_b_ptr);
 
