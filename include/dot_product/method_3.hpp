@@ -33,6 +33,8 @@ method_3(sycl::queue& q,
   // in each iteration 2/ 4/ 8/ 16 consequtive input elements
   // can be loaded from global memory
   assert(in_a_len % VECTOR_WIDTH == 0);
+  // input vector is of length power of 2
+  assert((in_a_len & (in_a_len - 1)) == 0);
 
   return q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
@@ -40,8 +42,9 @@ method_3(sycl::queue& q,
     h.single_task<kernelDotProductMethod3>([=]() {
       const size_t upto = in_a_len >> VECTOR_WIDTH_LOG2;
 
-      sycl::global_ptr<sycl::uint> in_a_ptr{ in_a };
-      sycl::global_ptr<sycl::uint> in_b_ptr{ in_b };
+      sycl::device_ptr<sycl::uint> in_a_ptr{ in_a };
+      sycl::device_ptr<sycl::uint> in_b_ptr{ in_b };
+      sycl::device_ptr<sycl::uint> out_ptr{ out };
 
       sycl::uint tmp = 0;
 
@@ -91,7 +94,7 @@ method_3(sycl::queue& q,
 #endif
       }
 
-      *out = tmp;
+      out_ptr[0] = tmp;
     });
   });
 }

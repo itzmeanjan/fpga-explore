@@ -7,7 +7,7 @@ class kernelSummationMethod4;
 
 sycl::event
 method_4(sycl::queue& q,
-         const sycl::uint* in,
+         sycl::uint* const in,
          size_t in_len,
          sycl::uint* const out,
          std::vector<sycl::event> evts)
@@ -21,14 +21,22 @@ method_4(sycl::queue& q,
     // single work-item kernel
     h.single_task<kernelSummationMethod4>([=
     ]() [[intel::kernel_args_restrict]] {
-      [[intel::fpga_register]] sycl::uint tmp[4] = { 0, 0, 0, 0 };
+      sycl::device_ptr<sycl::uint> in_ptr{ in };
+      sycl::device_ptr<sycl::uint> out_ptr{ out };
 
-#pragma unroll 4
-      for (size_t i = 0; i < in_len; i++) {
-        tmp[i % 4] += *(in + i);
+      [[intel::fpga_register]] sycl::uint tmp[4];
+
+#pragma unroll 4 // fully unrolled; parallelized
+      for (size_t i = 0; i < 4; i++) {
+        tmp[i] = 0;
       }
 
-      *out = tmp[0] + tmp[1] + tmp[2] + tmp[3];
+#pragma unroll 4 // partially unrolled
+      for (size_t i = 0; i < in_len; i++) {
+        tmp[i % 4] += in_ptr[i];
+      }
+
+      out_ptr[0] = tmp[0] + tmp[1] + tmp[2] + tmp[3];
     });
   });
 }

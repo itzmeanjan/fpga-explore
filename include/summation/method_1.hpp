@@ -7,7 +7,7 @@ class kernelSummationMethod1;
 
 sycl::event
 method_1(sycl::queue& q,
-         const sycl::uint* in,
+         sycl::uint* in,
          size_t in_len,
          sycl::uint* const out,
          size_t wg_size,
@@ -28,6 +28,9 @@ method_1(sycl::queue& q,
     h.parallel_for<kernelSummationMethod1>(
       sycl::nd_range<1>{ sycl::range<1>{ in_len }, sycl::range<1>{ wg_size } },
       [=](sycl::nd_item<1> it) {
+        sycl::device_ptr<sycl::uint> in_ptr{ in };
+        sycl::device_ptr<sycl::uint> out_ptr{ out };
+
         const size_t glb_idx = it.get_global_linear_id();
         const size_t loc_idx = it.get_local_linear_id();
         sycl::group<1> grp = it.get_group();
@@ -49,7 +52,7 @@ method_1(sycl::queue& q,
           sycl::ext::oneapi::memory_scope::work_group,
           sycl::access::address_space::local_space>
           scratch_ref{ scratch[0] };
-        scratch_ref.fetch_add(*(in + glb_idx));
+        scratch_ref.fetch_add(in_ptr[glb_idx]);
 
         // all work-items wait until every other work-item
         // in work-group completes work-group local summation
@@ -63,7 +66,7 @@ method_1(sycl::queue& q,
             sycl::ext::oneapi::memory_order::relaxed,
             sycl::ext::oneapi::memory_scope::device,
             sycl::access::address_space::ext_intel_global_device_space>
-            out_ref{ *out };
+            out_ref{ out_ptr[0] };
           out_ref.fetch_add(scratch[0]);
         }
       });

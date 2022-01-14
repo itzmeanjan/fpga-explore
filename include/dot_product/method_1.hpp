@@ -7,9 +7,9 @@ class kernelDotProductMethod1;
 
 sycl::event
 method_1(sycl::queue& q,
-         const sycl::uint* in_a,
+         sycl::uint* in_a,
          size_t in_a_len,
-         const sycl::uint* in_b,
+         sycl::uint* in_b,
          size_t in_b_len,
          sycl::uint* const out,
          size_t wg_size,
@@ -33,6 +33,10 @@ method_1(sycl::queue& q,
       sycl::nd_range<1>{ sycl::range<1>{ in_a_len },
                          sycl::range<1>{ wg_size } },
       [=](sycl::nd_item<1> it) {
+        sycl::device_ptr<sycl::uint> in_a_ptr{ in_a };
+        sycl::device_ptr<sycl::uint> in_b_ptr{ in_b };
+        sycl::device_ptr<sycl::uint> out_ptr{ out };
+
         const size_t glb_idx = it.get_global_linear_id();
         const size_t loc_idx = it.get_local_linear_id();
         sycl::group<1> grp = it.get_group();
@@ -48,7 +52,7 @@ method_1(sycl::queue& q,
 
         sycl::group_barrier(grp, sycl::memory_scope::work_group);
 
-        sycl::uint tmp = *(in_a + glb_idx) * *(in_b + glb_idx);
+        sycl::uint tmp = in_a_ptr[glb_idx] * in_b_ptr[glb_idx];
 
         // atomically update ( work-group scope ) dot product in local memory
         sycl::ext::oneapi::atomic_ref<
@@ -70,7 +74,7 @@ method_1(sycl::queue& q,
             sycl::ext::oneapi::memory_order::relaxed,
             sycl::ext::oneapi::memory_scope::device,
             sycl::access::address_space::ext_intel_global_device_space>
-            out_ref{ *out };
+            out_ref{ out_ptr[0] };
           out_ref.fetch_add(scratch[0]);
         }
       });
