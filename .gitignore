@@ -4,4 +4,4 @@ fpga_emu.out
 fpga_opt.a
 fpga_hw.out
 *.o
-fpga_opt.prj
+*.prj
