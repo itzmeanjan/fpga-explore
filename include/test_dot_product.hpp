@@ -51,18 +51,23 @@ method_3
 #endif
   (sycl::queue& q, size_t in_len, size_t wg_size)
 {
-  sycl::uint* in_a_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_a_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_b_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_b_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* out_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint), q));
-  sycl::uint* out_d =
-    static_cast<sycl::uint*>(sycl::malloc_device(sizeof(sycl::uint), q));
+  sycl::uint* in_a_h = sycl::malloc_host<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_a_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* in_a_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_a_d, in_len, mem_alloc::DEVICE);
+
+  sycl::uint* in_b_h = sycl::malloc_host<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_b_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* in_b_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_b_d, in_len, mem_alloc::DEVICE);
+
+  sycl::uint* out_h = sycl::malloc_host<sycl::uint>(1, q);
+  mem_alloc_check<sycl::uint>(out_h, 1, mem_alloc::HOST);
+
+  sycl::uint* out_d = sycl::malloc_device<sycl::uint>(1, q);
+  mem_alloc_check<sycl::uint>(out_d, 1, mem_alloc::DEVICE);
 
   random_fill(in_a_h, in_len);
   random_fill(in_b_h, in_len);
