@@ -32,7 +32,9 @@ method_1(sycl::queue& q,
     h.parallel_for<kernelDotProductMethod1>(
       sycl::nd_range<1>{ sycl::range<1>{ in_a_len },
                          sycl::range<1>{ wg_size } },
-      [=](sycl::nd_item<1> it) {
+      [=](sycl::nd_item<1> it) [[intel::kernel_args_restrict,
+                                 intel::num_simd_work_items(8),
+                                 sycl::reqd_work_group_size(1, 1, 32)]] {
         sycl::device_ptr<sycl::uint> in_a_ptr{ in_a };
         sycl::device_ptr<sycl::uint> in_b_ptr{ in_b };
         sycl::device_ptr<sycl::uint> out_ptr{ out };
