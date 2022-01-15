@@ -51,19 +51,21 @@ method_3
 #endif
   (sycl::queue& q, size_t in_len, size_t wg_size)
 {
-  sycl::uint* in_a_h = sycl::malloc_host<sycl::uint>(in_len, q);
+  sycl::uint* in_a_h =
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
   mem_alloc_check<sycl::uint>(in_a_h, in_len, mem_alloc::HOST);
 
   sycl::uint* in_a_d = sycl::malloc_device<sycl::uint>(in_len, q);
   mem_alloc_check<sycl::uint>(in_a_d, in_len, mem_alloc::DEVICE);
 
-  sycl::uint* in_b_h = sycl::malloc_host<sycl::uint>(in_len, q);
+  sycl::uint* in_b_h =
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
   mem_alloc_check<sycl::uint>(in_b_h, in_len, mem_alloc::HOST);
 
   sycl::uint* in_b_d = sycl::malloc_device<sycl::uint>(in_len, q);
   mem_alloc_check<sycl::uint>(in_b_d, in_len, mem_alloc::DEVICE);
 
-  sycl::uint* out_h = sycl::malloc_host<sycl::uint>(1, q);
+  sycl::uint* out_h = static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint)));
   mem_alloc_check<sycl::uint>(out_h, 1, mem_alloc::HOST);
 
   sycl::uint* out_d = sycl::malloc_device<sycl::uint>(1, q);
@@ -111,11 +113,12 @@ method_3
 
   sycl::cl_ulong ts = time_event(evt_3);
 
-  sycl::free(in_a_h, q);
+  std::free(in_a_h);
+  std::free(in_b_h);
+  std::free(out_h);
+
   sycl::free(in_a_d, q);
-  sycl::free(in_b_h, q);
   sycl::free(in_b_d, q);
-  sycl::free(out_h, q);
   sycl::free(out_d, q);
 
   return ts;
