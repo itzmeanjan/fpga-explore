@@ -39,7 +39,8 @@ method_3(sycl::queue& q,
   return q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
 
-    h.single_task<kernelDotProductMethod3>([=]() {
+    h.single_task<kernelDotProductMethod3>([=
+    ]() [[intel::kernel_args_restrict]] {
       const size_t upto = in_a_len >> VECTOR_WIDTH_LOG2;
 
       sycl::device_ptr<sycl::uint> in_a_ptr{ in_a };
