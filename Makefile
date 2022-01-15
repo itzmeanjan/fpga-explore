@@ -76,7 +76,7 @@ fpga_opt_test:
 
 fpga_hw_test:
 	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
-		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_HW_FLAGS)  test/main.cpp -o test/fpga_hw.out; \
+		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_HW_FLAGS) -reuse-exe=test/fpga_hw.out test/main.cpp -o test/fpga_hw.out; \
 	else \
 		echo "Must select kernel !"; \
 	fi
