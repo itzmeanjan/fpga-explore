@@ -49,13 +49,7 @@ TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 # You want to specify it when invoking make as `$ TARGET_KERNEL=summation_method_0 make`
 TARGET_KERNEL_FLAGS = -D$(shell echo $(or $(TARGET_KERNEL),place_holder))
 
-all: test
-
-test: test/a.out
-	./$<
-
-test/a.out: test/main.cpp include/*.hpp
-	$(CXX) $(CXX_FLAGS) $(SYCL_FLAGS) $(TARGET_FLAGS) $(TARGET_KERNEL_FLAGS) $(INCLUDES) $< -o $@
+all: fpga_emu_test
 
 fpga_emu_test:
 	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
