@@ -31,6 +31,11 @@ main(int argc, char** argv)
             << q->get_device().get_info<sycl::info::device::name>() << std::endl
             << std::endl;
 
+  if (!q->get_device().get_info<sycl::info::device::usm_device_allocations>()) {
+    std::cerr << "USM device allocation not supported !" << std::endl;
+    return 1;
+  }
+
 #if defined(summation_method_0)
 
   sycl::cl_ulong ts = 0;
