@@ -2,7 +2,7 @@
 #include <CL/sycl.hpp>
 #include <cassert>
 
-namespace matmul {
+namespace mat_mul {
 class kernelMatMulMethod0;
 
 sycl::event
