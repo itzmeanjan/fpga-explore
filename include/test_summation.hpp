@@ -16,6 +16,9 @@
 #elif defined(summation_method_4)
 #include "summation/method_4.hpp"
 #pragma message("Compiling summation method_4 kernel")
+#elif defined(summation_method_5)
+#include "summation/method_5.hpp"
+#pragma message("Compiling summation method_5 kernel")
 #else
 #pragma message(                                                               \
   "Specify which kernel(s) to compile, when invoking `make` utility")
@@ -239,9 +242,15 @@ method_3(sycl::queue& q, size_t in_len, size_t wg_size)
 }
 #endif
 
-#if defined(summation_method_4)
+#if defined(summation_method_4) || defined(summation_method_5)
+
 sycl::cl_ulong
-method_4(sycl::queue& q, size_t in_len, size_t wg_size)
+#if defined(summation_method_4)
+method_4
+#elif defined(summation_method_5)
+method_5
+#endif
+  (sycl::queue& q, size_t in_len, size_t wg_size)
 {
   sycl::uint* in_h =
     static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
@@ -259,7 +268,13 @@ method_4(sycl::queue& q, size_t in_len, size_t wg_size)
   random_fill(in_h, in_len);
 
   sycl::event evt_0 = q.memcpy(in_d, in_h, sizeof(sycl::uint) * in_len);
-  sycl::event evt_1 = summation::method_4(q, in_d, in_len, out_d, { evt_0 });
+  sycl::event evt_1 = summation::
+#if defined(summation_method_4)
+    method_4
+#elif defined(summation_method_5)
+    method_5
+#endif
+    (q, in_d, in_len, out_d, { evt_0 });
   sycl::event evt_2 = q.submit([&](sycl::handler& h) {
     h.depends_on(evt_1);
     h.memcpy(out_h, out_d, sizeof(sycl::uint));
@@ -283,5 +298,6 @@ method_4(sycl::queue& q, size_t in_len, size_t wg_size)
 
   return ts;
 }
+
 #endif
 }
