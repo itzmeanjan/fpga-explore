@@ -78,7 +78,7 @@ qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_fpga_hw.sh -W depend=after
 # fill in job id, obtained after enqueuing fpga compilation job
 ```
 
-> Note, h/w image exeuction target is set to `stratix10`, because h/w compilation phase also targeted that fpga. **You may want to read [this](https://github.com/itzmeanjan/fpga-explore/blob/849c728bc9b514fa60183f45b2f58328ece3bd31/Makefile#L11-L21).**
+> Note, h/w image execution target is set to `stratix10`, because h/w compilation phase also targeted that fpga. **You may want to read [this](https://github.com/itzmeanjan/fpga-explore/blob/849c728bc9b514fa60183f45b2f58328ece3bd31/Makefile#L11-L21).**
 
 ## Results
 

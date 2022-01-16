@@ -24,21 +24,26 @@ method_4(sycl::queue& q,
       sycl::device_ptr<sycl::uint> in_ptr{ in };
       sycl::device_ptr<sycl::uint> out_ptr{ out };
 
-      [[intel::fpga_register]] sycl::uint tmp[9];
+      [[intel::fpga_register]] sycl::uint tmp_0[8];
+      [[intel::fpga_register]] sycl::uint tmp_1[8];
 
-#pragma unroll 9 // fully unrolled; parallelized
-      for (size_t i = 0; i < 9; i++) {
-        tmp[i] = 0;
+#pragma unroll 8 // fully unrolled; parallelized
+      for (size_t i = 0; i < 8; i++) {
+        tmp_0[i] = 0;
+        tmp_1[i] = 0;
       }
 
-#pragma unroll 9 // partially unrolled
-      for (size_t i = 0; i < in_len; i++) {
-        // using full width of 512 -bit read port
-        tmp[i % 9] += in_ptr[i];
+      const size_t upto = in_len >> 1;
+#pragma unroll 8 // partially unrolled
+      for (size_t i = 0; i < upto; i++) {
+        tmp_0[i % 8] += in_ptr[i];
+        tmp_1[i % 8] += in_ptr[i << 1];
       }
 
-      out_ptr[0] = tmp[0] + tmp[1] + tmp[2] + tmp[3] + tmp[4] + tmp[5] +
-                   tmp[6] + tmp[7] + tmp[8];
+      out_ptr[0] = tmp_0[0] + tmp_0[1] + tmp_0[2] + tmp_0[3] + tmp_0[4] +
+                   tmp_0[5] + tmp_0[6] + tmp_0[7] + tmp_1[0] + tmp_1[1] +
+                   tmp_1[2] + tmp_1[3] + tmp_1[4] + tmp_1[5] + tmp_1[6] +
+                   tmp_1[7];
     });
   });
 }
