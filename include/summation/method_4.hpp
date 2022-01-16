@@ -37,7 +37,7 @@ method_4(sycl::queue& q,
 #pragma unroll 8 // partially unrolled
       for (size_t i = 0; i < upto; i++) {
         tmp_0[i % 8] += in_ptr[i];
-        tmp_1[i % 8] += in_ptr[i << 1];
+        tmp_1[i % 8] += in_ptr[upto + i];
       }
 
       out_ptr[0] = tmp_0[0] + tmp_0[1] + tmp_0[2] + tmp_0[3] + tmp_0[4] +
