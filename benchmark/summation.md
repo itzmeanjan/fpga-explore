@@ -119,16 +119,16 @@ avg 235.145 ms
 ### summation_method_4
 
 ```bash
-running on pac_s10 : Intel PAC Platform (pac_ec00000)
+running on pac_s10 : Intel PAC Platform (pac_ee00000)
 
-passed summation ( method_4 ) test              in 11.5351 ms
-passed summation ( method_4 ) test              in 11.5323 ms
-passed summation ( method_4 ) test              in 11.5327 ms
-passed summation ( method_4 ) test              in 11.5323 ms
-passed summation ( method_4 ) test              in 11.5331 ms
-passed summation ( method_4 ) test              in 11.5332 ms
-passed summation ( method_4 ) test              in 11.5325 ms
-passed summation ( method_4 ) test              in 11.5327 ms
+passed summation ( method_4 ) test              in 3.22707 ms
+passed summation ( method_4 ) test              in 3.2262 ms
+passed summation ( method_4 ) test              in 3.22495 ms
+passed summation ( method_4 ) test              in 3.22637 ms
+passed summation ( method_4 ) test              in 3.22536 ms
+passed summation ( method_4 ) test              in 3.22428 ms
+passed summation ( method_4 ) test              in 3.22458 ms
+passed summation ( method_4 ) test              in 3.22487 ms
 
-avg 11.533 ms
+avg 3.22546 ms
 ```
