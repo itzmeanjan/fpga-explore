@@ -24,20 +24,21 @@ method_4(sycl::queue& q,
       sycl::device_ptr<sycl::uint> in_ptr{ in };
       sycl::device_ptr<sycl::uint> out_ptr{ out };
 
-      [[intel::fpga_register]] sycl::uint tmp[8];
+      [[intel::fpga_register]] sycl::uint tmp[9];
 
-#pragma unroll 8 // fully unrolled; parallelized
-      for (size_t i = 0; i < 8; i++) {
+#pragma unroll 9 // fully unrolled; parallelized
+      for (size_t i = 0; i < 9; i++) {
         tmp[i] = 0;
       }
 
-#pragma unroll 8 // partially unrolled
+#pragma unroll 9 // partially unrolled
       for (size_t i = 0; i < in_len; i++) {
-        tmp[i % 8] += in_ptr[i];
+        // using full width of 512 -bit read port
+        tmp[i % 9] += in_ptr[i];
       }
 
-      out_ptr[0] =
-        tmp[0] + tmp[1] + tmp[2] + tmp[3] + tmp[4] + tmp[5] + tmp[6] + tmp[7];
+      out_ptr[0] = tmp[0] + tmp[1] + tmp[2] + tmp[3] + tmp[4] + tmp[5] +
+                   tmp[6] + tmp[7] + tmp[8];
     });
   });
 }
