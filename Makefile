@@ -41,6 +41,7 @@ TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 # - summation_method_2
 # - summation_method_3
 # - summation_method_4
+# - summation_method_5
 # - dot_product_method_0
 # - dot_product_method_1
 # - dot_product_method_2
