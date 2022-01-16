@@ -26,7 +26,6 @@ method_5(sycl::queue& q,
 
       [[intel::fpga_register]] sycl::uint tmp = 0;
 
-#pragma unroll // partially unrolled
       for (size_t i = 0; i < in_len; i++) {
         tmp += in_ptr[i];
       }
