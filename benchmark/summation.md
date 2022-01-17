@@ -27,7 +27,7 @@ export PATH=/glob/intel-python/python2/bin/:${PATH}
 source /opt/intel/inteloneapi/setvars.sh > /dev/null 2>&1
 
 # hardware compilation of one kernel ( choose which one )
-TARGET_KERNEL=summation_method_{0,1,2,3,4} make fpga_hw_test
+TARGET_KERNEL=summation_method_{0,1,2,3,4,5} make fpga_hw_test
 ```
 
 Then execute following shell command to submit job to queue, with 12 hours timeout. Note the job id you get, it'll be used when submitting fpga image execution job, to form a dependency chain.
@@ -131,4 +131,21 @@ passed summation ( method_4 ) test              in 3.22458 ms
 passed summation ( method_4 ) test              in 3.22487 ms
 
 avg 3.22546 ms
+```
+
+### summation_method_5
+
+```bash
+running on pac_s10 : Intel PAC Platform (pac_ec00000)
+
+passed summation ( method_5 ) test              in 43.5013 ms
+passed summation ( method_5 ) test              in 43.5014 ms
+passed summation ( method_5 ) test              in 43.5011 ms
+passed summation ( method_5 ) test              in 43.501 ms
+passed summation ( method_5 ) test              in 43.4998 ms
+passed summation ( method_5 ) test              in 43.5002 ms
+passed summation ( method_5 ) test              in 43.5005 ms
+passed summation ( method_5 ) test              in 43.4995 ms
+
+avg 43.5006 ms
 ```
