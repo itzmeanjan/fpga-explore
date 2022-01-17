@@ -65,3 +65,27 @@ random_fill(sycl::uint* const in, size_t in_len)
     *(in + i) = dis(gen);
   }
 }
+
+enum mem_alloc
+{
+  DEVICE,
+  HOST,
+  SHARED
+};
+
+// Check whether requested memory allocation failed or not
+//
+// If failed, it doesn't proceed anymore !
+template<typename T>
+requires std::is_integral<T>::value void
+mem_alloc_check(const T* ptr, size_t count, mem_alloc alloc_type)
+{
+  if (ptr == nullptr) {
+    std::cerr << "Failed to allocate " << sizeof(T) * count << " bytes on "
+              << (alloc_type == mem_alloc::DEVICE
+                    ? "device !"
+                    : alloc_type == mem_alloc::HOST ? "host !" : "!")
+              << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+}

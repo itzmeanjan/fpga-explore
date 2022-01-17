@@ -16,6 +16,9 @@
 #elif defined(summation_method_4)
 #include "summation/method_4.hpp"
 #pragma message("Compiling summation method_4 kernel")
+#elif defined(summation_method_5)
+#include "summation/method_5.hpp"
+#pragma message("Compiling summation method_5 kernel")
 #else
 #pragma message(                                                               \
   "Specify which kernel(s) to compile, when invoking `make` utility")
@@ -37,13 +40,17 @@ sycl::cl_ulong
 method_0(sycl::queue& q, size_t in_len, size_t wg_size)
 {
   sycl::uint* in_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* out_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint), q));
-  sycl::uint* out_d =
-    static_cast<sycl::uint*>(sycl::malloc_device(sizeof(sycl::uint), q));
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
+  mem_alloc_check<sycl::uint>(in_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* in_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_d, in_len, mem_alloc::DEVICE);
+
+  sycl::uint* out_h = static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint)));
+  mem_alloc_check<sycl::uint>(out_h, 1, mem_alloc::HOST);
+
+  sycl::uint* out_d = sycl::malloc_device<sycl::uint>(1, q);
+  mem_alloc_check<sycl::uint>(out_d, 1, mem_alloc::DEVICE);
 
   random_fill(in_h, in_len);
 
@@ -66,9 +73,9 @@ method_0(sycl::queue& q, size_t in_len, size_t wg_size)
 
   sycl::cl_ulong ts = time_event(evt_2);
 
-  sycl::free(in_h, q);
+  std::free(in_h);
   sycl::free(in_d, q);
-  sycl::free(out_h, q);
+  std::free(out_h);
   sycl::free(out_d, q);
 
   return ts;
@@ -80,13 +87,17 @@ sycl::cl_ulong
 method_1(sycl::queue& q, size_t in_len, size_t wg_size)
 {
   sycl::uint* in_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* out_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint), q));
-  sycl::uint* out_d =
-    static_cast<sycl::uint*>(sycl::malloc_device(sizeof(sycl::uint), q));
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
+  mem_alloc_check<sycl::uint>(in_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* in_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_d, in_len, mem_alloc::DEVICE);
+
+  sycl::uint* out_h = static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint)));
+  mem_alloc_check<sycl::uint>(out_h, 1, mem_alloc::HOST);
+
+  sycl::uint* out_d = sycl::malloc_device<sycl::uint>(1, q);
+  mem_alloc_check<sycl::uint>(out_d, 1, mem_alloc::DEVICE);
 
   random_fill(in_h, in_len);
 
@@ -109,9 +120,9 @@ method_1(sycl::queue& q, size_t in_len, size_t wg_size)
 
   sycl::cl_ulong ts = time_event(evt_2);
 
-  sycl::free(in_h, q);
+  std::free(in_h);
   sycl::free(in_d, q);
-  sycl::free(out_h, q);
+  std::free(out_h);
   sycl::free(out_d, q);
 
   return ts;
@@ -128,17 +139,25 @@ method_2(sycl::queue& q, size_t in_len, size_t wg_size)
   const size_t out_len = total_work_items / rev_wg_size;
 
   sycl::uint* in_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* out_h = static_cast<sycl::uint*>(
-    sycl::malloc_host(sizeof(sycl::uint) * out_len, q));
-  sycl::uint* out_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * out_len, q));
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
+  mem_alloc_check<sycl::uint>(in_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* in_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_d, in_len, mem_alloc::DEVICE);
+
+  sycl::uint* out_h =
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * out_len));
+  mem_alloc_check<sycl::uint>(out_h, out_len, mem_alloc::HOST);
+
+  sycl::uint* out_d = sycl::malloc_device<sycl::uint>(out_len, q);
+  mem_alloc_check<sycl::uint>(out_d, out_len, mem_alloc::DEVICE);
+
   sycl::uint* out_final_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint), q));
-  sycl::uint* out_final_d =
-    static_cast<sycl::uint*>(sycl::malloc_device(sizeof(sycl::uint), q));
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint)));
+  mem_alloc_check<sycl::uint>(out_h, 1, mem_alloc::HOST);
+
+  sycl::uint* out_final_d = sycl::malloc_device<sycl::uint>(1, q);
+  mem_alloc_check<sycl::uint>(out_d, 1, mem_alloc::DEVICE);
 
   random_fill(in_h, in_len);
 
@@ -161,11 +180,11 @@ method_2(sycl::queue& q, size_t in_len, size_t wg_size)
 
   sycl::cl_ulong ts = time_event(evts.at(0)) + time_event(evts.at(1));
 
-  sycl::free(in_h, q);
+  std::free(in_h);
   sycl::free(in_d, q);
-  sycl::free(out_h, q);
+  std::free(out_h);
   sycl::free(out_d, q);
-  sycl::free(out_final_h, q);
+  std::free(out_final_h);
   sycl::free(out_final_d, q);
 
   return ts;
@@ -177,13 +196,18 @@ sycl::cl_ulong
 method_3(sycl::queue& q, size_t in_len, size_t wg_size)
 {
   sycl::uint* in_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
+  mem_alloc_check<sycl::uint>(in_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* in_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_d, in_len, mem_alloc::DEVICE);
+
   sycl::uint* out_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* out_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
+  mem_alloc_check<sycl::uint>(out_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* out_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(out_d, in_len, mem_alloc::DEVICE);
 
   random_fill(in_h, in_len);
 
@@ -209,32 +233,48 @@ method_3(sycl::queue& q, size_t in_len, size_t wg_size)
     ts += time_event(evt);
   }
 
-  sycl::free(in_h, q);
+  std::free(in_h);
   sycl::free(in_d, q);
-  sycl::free(out_h, q);
+  std::free(out_h);
   sycl::free(out_d, q);
 
   return ts;
 }
 #endif
 
-#if defined(summation_method_4)
+#if defined(summation_method_4) || defined(summation_method_5)
+
 sycl::cl_ulong
-method_4(sycl::queue& q, size_t in_len, size_t wg_size)
+#if defined(summation_method_4)
+method_4
+#elif defined(summation_method_5)
+method_5
+#endif
+  (sycl::queue& q, size_t in_len, size_t wg_size)
 {
   sycl::uint* in_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* in_d = static_cast<sycl::uint*>(
-    sycl::malloc_device(sizeof(sycl::uint) * in_len, q));
-  sycl::uint* out_h =
-    static_cast<sycl::uint*>(sycl::malloc_host(sizeof(sycl::uint), q));
-  sycl::uint* out_d =
-    static_cast<sycl::uint*>(sycl::malloc_device(sizeof(sycl::uint), q));
+    static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint) * in_len));
+  mem_alloc_check<sycl::uint>(in_h, in_len, mem_alloc::HOST);
+
+  sycl::uint* in_d = sycl::malloc_device<sycl::uint>(in_len, q);
+  mem_alloc_check<sycl::uint>(in_d, in_len, mem_alloc::DEVICE);
+
+  sycl::uint* out_h = static_cast<sycl::uint*>(std::malloc(sizeof(sycl::uint)));
+  mem_alloc_check<sycl::uint>(out_h, 1, mem_alloc::HOST);
+
+  sycl::uint* out_d = sycl::malloc_device<sycl::uint>(1, q);
+  mem_alloc_check<sycl::uint>(out_d, 1, mem_alloc::DEVICE);
 
   random_fill(in_h, in_len);
 
   sycl::event evt_0 = q.memcpy(in_d, in_h, sizeof(sycl::uint) * in_len);
-  sycl::event evt_1 = summation::method_4(q, in_d, in_len, out_d, { evt_0 });
+  sycl::event evt_1 = summation::
+#if defined(summation_method_4)
+    method_4
+#elif defined(summation_method_5)
+    method_5
+#endif
+    (q, in_d, in_len, out_d, { evt_0 });
   sycl::event evt_2 = q.submit([&](sycl::handler& h) {
     h.depends_on(evt_1);
     h.memcpy(out_h, out_d, sizeof(sycl::uint));
@@ -251,12 +291,13 @@ method_4(sycl::queue& q, size_t in_len, size_t wg_size)
 
   sycl::cl_ulong ts = time_event(evt_1);
 
-  sycl::free(in_h, q);
+  std::free(in_h);
   sycl::free(in_d, q);
-  sycl::free(out_h, q);
+  std::free(out_h);
   sycl::free(out_d, q);
 
   return ts;
 }
+
 #endif
 }

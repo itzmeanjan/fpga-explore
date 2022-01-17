@@ -3,9 +3,11 @@
 #include <cassert>
 
 namespace summation {
+class kernelSummationMethod0;
+
 sycl::event
 method_0(sycl::queue& q,
-         const sycl::uint* in,
+         sycl::uint* in,
          size_t in_len,
          sycl::uint* const out,
          size_t wg_size,
@@ -17,21 +19,24 @@ method_0(sycl::queue& q,
 
   return q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
-    h.parallel_for<class kernelSummationMethod0>(
+    h.parallel_for<kernelSummationMethod0>(
       sycl::nd_range<1>{ sycl::range<1>{ in_len }, sycl::range<1>{ wg_size } },
       [=](sycl::nd_item<1> it) {
+        sycl::device_ptr<sycl::uint> in_ptr{ in };
+        sycl::device_ptr<sycl::uint> out_ptr{ out };
+
         // which input element to (atomically)  add
         const size_t idx = it.get_global_linear_id();
 
+        // atomically update global sum holder memory location with
+        // relaxed memory ordering
         sycl::ext::oneapi::atomic_ref<
           sycl::uint,
           sycl::ext::oneapi::memory_order::relaxed,
           sycl::ext::oneapi::memory_scope::device,
           sycl::access::address_space::ext_intel_global_device_space>
-          out_ref{ *out };
-        out_ref.fetch_add(*(in + idx));
-        // atomically update global sum holder memory location with
-        // relaxed memory ordering
+          out_ref{ out_ptr[0] };
+        out_ref.fetch_add(in_ptr[idx]);
       });
   });
 }

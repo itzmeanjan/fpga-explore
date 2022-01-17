@@ -3,9 +3,12 @@
 #include <cassert>
 
 namespace summation {
+class kernelSummationMethod3Phase0;
+class kernelSummationMethod3Phase1;
+
 std::vector<sycl::event>
 method_3(sycl::queue& q,
-         const sycl::uint* in,
+         sycl::uint* const in,
          size_t in_len,
          sycl::uint* const out,
          size_t out_len,
@@ -29,14 +32,17 @@ method_3(sycl::queue& q,
   sycl::event evt_0 = q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
 
-    h.parallel_for<class kernelSummationMethod3Phase0>(
+    h.parallel_for<kernelSummationMethod3Phase0>(
       sycl::nd_range<1>{ sycl::range<1>{ total_work_items },
                          sycl::range<1>{ rev_wg_size } },
       [=](sycl::nd_item<1> it) {
+        sycl::device_ptr<sycl::uint> in_ptr{ in };
+        sycl::device_ptr<sycl::uint> out_ptr{ out };
+
         const size_t idx = it.get_global_linear_id();
         const size_t in_offset = idx << 1;
 
-        *(out + out_offset + idx) = *(in + in_offset) + *(in + in_offset + 1);
+        out_ptr[out_offset + idx] = in_ptr[in_offset] + in_ptr[in_offset + 1];
       });
   });
 
@@ -57,15 +63,17 @@ method_3(sycl::queue& q,
         const size_t rev_wg_size = wg_size <= req_wi_cnt ? wg_size : req_wi_cnt;
         const size_t out_offset = req_wi_cnt;
 
-        h.parallel_for<class kernelSummationMethod3Phase1>(
+        h.parallel_for<kernelSummationMethod3Phase1>(
           sycl::nd_range<1>{ sycl::range<1>{ req_wi_cnt },
                              sycl::range<1>{ rev_wg_size } },
           [=](sycl::nd_item<1> it) {
+            sycl::device_ptr<sycl::uint> out_ptr{ out };
+
             const size_t idx = it.get_global_linear_id();
             const size_t in_offset = (out_offset << 1) + (idx << 1);
 
-            *(out + out_offset + idx) =
-              *(out + in_offset) + *(out + in_offset + 1);
+            out_ptr[out_offset + idx] =
+              out_ptr[in_offset] + out_ptr[in_offset + 1];
           });
       });
 

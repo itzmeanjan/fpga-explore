@@ -3,11 +3,13 @@
 #include <cassert>
 
 namespace dot_product {
+class kernelDotProductMethod0;
+
 sycl::event
 method_0(sycl::queue& q,
-         const sycl::uint* in_a,
+         sycl::uint* in_a,
          size_t in_a_len,
-         const sycl::uint* in_b,
+         sycl::uint* in_b,
          size_t in_b_len,
          sycl::uint* const out,
          size_t wg_size,
@@ -22,12 +24,18 @@ method_0(sycl::queue& q,
   return q.submit([&](sycl::handler& h) {
     h.depends_on(evts);
 
-    h.parallel_for<class kernelDotProductMethod0>(
+    h.parallel_for<kernelDotProductMethod0>(
       sycl::nd_range<1>{ sycl::range<1>{ in_a_len },
                          sycl::range<1>{ wg_size } },
-      [=](sycl::nd_item<1> it) {
+      [=](sycl::nd_item<1> it) [[intel::kernel_args_restrict,
+                                 intel::num_simd_work_items(8),
+                                 sycl::reqd_work_group_size(1, 1, 32)]] {
+        sycl::device_ptr<sycl::uint> in_a_ptr{ in_a };
+        sycl::device_ptr<sycl::uint> in_b_ptr{ in_b };
+        sycl::device_ptr<sycl::uint> out_ptr{ out };
+
         const size_t idx = it.get_global_linear_id();
-        sycl::uint tmp = *(in_a + idx) * *(in_b + idx);
+        sycl::uint tmp = in_a_ptr[idx] * in_b_ptr[idx];
 
         // atomically update dot product stored in global memory
         sycl::ext::oneapi::atomic_ref<
@@ -35,7 +43,7 @@ method_0(sycl::queue& q,
           sycl::ext::oneapi::memory_order::relaxed,
           sycl::ext::oneapi::memory_scope::device,
           sycl::access::address_space::ext_intel_global_device_space>
-          out_ref{ *out };
+          out_ref{ out_ptr[0] };
         out_ref.fetch_add(tmp);
       });
   });
