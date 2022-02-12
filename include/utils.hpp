@@ -3,30 +3,21 @@
 #include <random>
 #include <sycl/ext/intel/fpga_extensions.hpp>
 
+#if !(defined(TARGET_FPGA_EMU) || defined(TARGET_FPGA))
+#define TARGET_FPGA_EMU
+#endif
+
 void
 make_queue(void** wq)
 {
 
-#if defined(TARGET_CPU)
-  sycl::cpu_selector d_sel{};
-#pragma message("Using SYCL cpu_selector; see `include/utils.hpp` for options")
-#elif defined(TARGET_GPU)
-  sycl::gpu_selector d_sel{};
-#pragma message("Using SYCL gpu_selector; see `include/utils.hpp` for options")
-#elif defined(TARGET_FPGA_EMU)
+#if defined(TARGET_FPGA_EMU)
   sycl::ext::intel::fpga_emulator_selector d_sel{};
 #pragma message(                                                               \
   "Using SYCL fpga_emulator_selector; see `include/utils.hpp` for options")
 #elif defined(TARGET_FPGA)
   sycl::ext::intel::fpga_selector d_sel{};
 #pragma message("Using SYCL fpga_selector; see `include/utils.hpp` for options")
-#elif defined(TARGET_DEFAULT)
-  sycl::default_selector d_sel{};
-#pragma message(                                                               \
-  "Using SYCL default_selector; see `include/utils.hpp` for options")
-#else
-  sycl::host_selector d_sel{};
-#pragma message("Using SYCL host_selector; see `include/utils.hpp` for options")
 #endif
 
   sycl::device d{ d_sel };
