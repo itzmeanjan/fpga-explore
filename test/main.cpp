@@ -6,7 +6,8 @@
   defined(summation_method_4) || defined(summation_method_5)
 #include "test_summation.hpp"
 #elif defined(dot_product_method_0) || defined(dot_product_method_1) ||        \
-  defined(dot_product_method_2) || defined(dot_product_method_3)
+  defined(dot_product_method_2) || defined(dot_product_method_3) ||            \
+  defined(dot_product_method_4)
 #include "test_dot_product.hpp"
 #endif
 
@@ -14,7 +15,8 @@
   defined(summation_method_2) || defined(summation_method_3) ||                \
   defined(summation_method_4) || defined(summation_method_5) ||                \
   defined(dot_product_method_0) || defined(dot_product_method_1) ||            \
-  defined(dot_product_method_2) || defined(dot_product_method_3)
+  defined(dot_product_method_2) || defined(dot_product_method_3) ||            \
+  defined(dot_product_method_4)
 constexpr size_t IN_LEN = 1 << 24;
 constexpr size_t WG_SIZE = 1 << 5;
 constexpr size_t ITR_CNT = 1 << 3;
@@ -167,6 +169,20 @@ main(int argc, char** argv)
   for (size_t i = 0; i < ITR_CNT; i++) {
     sycl::cl_ulong ts_ = test_dot_product::method_3(*q, IN_LEN, WG_SIZE);
     std::cout << "passed dot_product ( method_3 ) test\t\t"
+              << "in " << (double)ts_ * 1e-6 << " ms" << std::endl;
+
+    ts += ts_;
+  }
+
+  std::cout << "\navg " << (double)(ts / ITR_CNT) * 1e-6 << " ms" << std::endl;
+
+#elif defined(dot_product_method_4)
+
+  sycl::cl_ulong ts = 0;
+
+  for (size_t i = 0; i < ITR_CNT; i++) {
+    sycl::cl_ulong ts_ = test_dot_product::method_4(*q, IN_LEN, WG_SIZE);
+    std::cout << "passed dot_product ( method_4 ) test\t\t"
               << "in " << (double)ts_ * 1e-6 << " ms" << std::endl;
 
     ts += ts_;

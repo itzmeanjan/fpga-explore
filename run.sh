@@ -16,3 +16,4 @@ TARGET_KERNEL=dot_product_method_0 make fpga_emu_test; make clean
 TARGET_KERNEL=dot_product_method_1 make fpga_emu_test; make clean
 TARGET_KERNEL=dot_product_method_2 make fpga_emu_test; make clean
 TARGET_KERNEL=dot_product_method_3 make fpga_emu_test; make clean
+TARGET_KERNEL=dot_product_method_4 make fpga_emu_test; make clean
