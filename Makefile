@@ -1,7 +1,6 @@
 CXX = dpcpp
 CXX_FLAGS = -std=c++20 -Wall
-SYCL_FLAGS = -fsycl
-SYCL_CUDA_FLAGS = -fsycl -fsycl-targets=nvptx64-nvidia-cuda
+OPT_FLAGS = -O3
 INCLUDES = -I./include
 SYCL_FPGA_EMU_FLAGS = -DTARGET_FPGA_EMU -fintelfpga
 
@@ -25,14 +24,11 @@ SYCL_FPGA_HW_FLAGS = -DTARGET_FPGA -fintelfpga -Xshardware -Xsboard=intel_s10sx_
 #
 # Possible values for TARGET can be
 #
-# - cpu
-# - gpu
 # - fpga_emu
 # - fpga
-# - default
 #
-# You probably want to specify it when invoking make utility as `$ TARGET=fpga_emu make`
-TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
+# You probably want to specify it when invoking make utility as `$ TARGET={fpga_emu|fpga} make`
+TARGET_FLAGS = -DTARGET_$(shell echo $(TARGET) | tr a-z A-Z)
 
 # Possible values for TARGET_KERNEL 
 #
@@ -46,6 +42,7 @@ TARGET_FLAGS = -DTARGET_$(shell echo $(or $(TARGET),default) | tr a-z A-Z)
 # - dot_product_method_1
 # - dot_product_method_2
 # - dot_product_method_3
+# - dot_product_method_4
 #
 # You want to specify it when invoking make as `$ TARGET_KERNEL=summation_method_0 make`
 TARGET_KERNEL_FLAGS = -D$(shell echo $(or $(TARGET_KERNEL),place_holder))
@@ -54,7 +51,7 @@ all: fpga_emu_test
 
 fpga_emu_test:
 	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
-		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_EMU_FLAGS)  test/main.cpp -o test/fpga_emu.out; \
+		$(CXX) $(CXX_FLAGS) $(OPT_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_EMU_FLAGS)  test/main.cpp -o test/fpga_emu.out; \
 		./test/fpga_emu.out; \
 	else \
 		echo "Must select kernel !"; \
@@ -64,14 +61,14 @@ fpga_opt_test:
 	# output not supposed to be executed, instead consume report generated
 	# inside `test/fpga_opt.prj/reports/` diretory
 	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
-		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_OPT_FLAGS)  test/main.cpp -o test/fpga_opt.a; \
+		$(CXX) $(CXX_FLAGS) $(OPT_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_OPT_FLAGS)  test/main.cpp -o test/fpga_opt.a; \
 	else \
 		echo "Must select kernel !"; \
 	fi
 
 fpga_hw_test:
 	@if [ $(TARGET_KERNEL_FLAGS) != '-Dplace_holder' ]; then \
-		$(CXX) $(CXX_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_HW_FLAGS) -reuse-exe=test/fpga_hw.out test/main.cpp -o test/fpga_hw.out; \
+		$(CXX) $(CXX_FLAGS) $(OPT_FLAGS) $(INCLUDES) $(TARGET_KERNEL_FLAGS) $(SYCL_FPGA_HW_FLAGS) -reuse-exe=test/fpga_hw.out test/main.cpp -o test/fpga_hw.out; \
 	else \
 		echo "Must select kernel !"; \
 	fi
