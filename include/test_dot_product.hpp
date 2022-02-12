@@ -13,6 +13,9 @@
 #elif defined(dot_product_method_3)
 #include "dot_product/method_3.hpp"
 #pragma message("Compiling dot product method_3 kernel")
+#elif defined(dot_product_method_4)
+#include "dot_product/method_4.hpp"
+#pragma message("Compiling dot product method_4 kernel")
 #else
 #pragma message(                                                               \
   "Specify which kernel(s) to compile, when invoking `make` utility")
@@ -37,7 +40,8 @@ seq_dot_product(const sycl::uint* in_a,
 }
 
 #if defined(dot_product_method_0) || defined(dot_product_method_1) ||          \
-  defined(dot_product_method_2) || defined(dot_product_method_3)
+  defined(dot_product_method_2) || defined(dot_product_method_3) ||            \
+  defined(dot_product_method_4)
 
 sycl::cl_ulong
 #if defined(dot_product_method_0)
@@ -48,6 +52,8 @@ method_1
 method_2
 #elif defined(dot_product_method_3)
 method_3
+#elif defined(dot_product_method_4)
+method_4
 #endif
   (sycl::queue& q, size_t in_len, size_t wg_size)
 {
@@ -87,6 +93,8 @@ method_3
     method_2
 #elif defined(dot_product_method_3)
     method_3
+#elif defined(dot_product_method_4)
+    method_4
 #endif
     (q,
      in_a_d,
