@@ -132,3 +132,20 @@ passed dot_product ( method_3 ) test            in 90.9965 ms
 
 avg 90.9959 ms
 ```
+
+### dot_product_method_4
+
+```bash
+running on pac_s10 : Intel PAC Platform (pac_ee00000)
+
+passed dot_product ( method_4 ) test            in 273.292 ms
+passed dot_product ( method_4 ) test            in 273.289 ms
+passed dot_product ( method_4 ) test            in 273.291 ms
+passed dot_product ( method_4 ) test            in 273.29 ms
+passed dot_product ( method_4 ) test            in 273.292 ms
+passed dot_product ( method_4 ) test            in 273.289 ms
+passed dot_product ( method_4 ) test            in 273.291 ms
+passed dot_product ( method_4 ) test            in 273.292 ms
+
+avg 273.291 ms
+```
