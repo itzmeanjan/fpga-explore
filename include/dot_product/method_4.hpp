@@ -37,11 +37,17 @@ method_4(sycl::queue& q,
       [[intel::fpga_memory("BLOCK_RAM"),
         intel::bankwidth(4),
         intel::numbanks(16)]] sycl::uint loader_b[16];
+      [[intel::fpga_memory("BLOCK_RAM"),
+        intel::bankwidth(4),
+        intel::numbanks(16)]] sycl::uint tmp_sum[16];
 
-      // dot product to be accumulated here !
-      [[intel::fpga_register]] sycl::uint glb_sum = 0;
+#pragma unroll 16
+      for (size_t i = 0; i < 16; i++) {
+        tmp_sum[i] = 0;
+      }
 
-      for (size_t i = 0; i < in_a_len; i += 16) {
+      [[intel::ivdep]] for (size_t i = 0; i < in_a_len; i += 16)
+      {
 #pragma unroll 16 // 512 -bit burst coalesced loading from global memory
         for (size_t j = 0; j < 16; j++) {
           loader_a[j] = in_a_ptr[i + j];
@@ -51,21 +57,17 @@ method_4(sycl::queue& q,
           loader_b[j] = in_b_ptr[i + j];
         }
 
-        // holds dot product of 16 `sycl::uint`
-        [[intel::fpga_register]] sycl::uint loc_sum = 0;
-
-        // this loop can be fully pipelined with II 1
-        [[intel::ivdep]] for (size_t j = 0; j < 16; j++)
-        {
-          loc_sum += loader_a[j] * loader_b[j];
+#pragma unroll 16
+        for (size_t j = 0; j < 16; j++) {
+          tmp_sum[j] += loader_a[j] * loader_b[j];
         }
-
-        // accumulate
-        glb_sum += loc_sum;
       }
 
       // finally write dot product back to global memory
-      out_ptr[0] = glb_sum;
+      out_ptr[0] = tmp_sum[0] + tmp_sum[1] + tmp_sum[2] + tmp_sum[3] +
+                   tmp_sum[4] + tmp_sum[5] + tmp_sum[6] + tmp_sum[7] +
+                   tmp_sum[8] + tmp_sum[9] + tmp_sum[10] + tmp_sum[11] +
+                   tmp_sum[12] + tmp_sum[13] + tmp_sum[14] + tmp_sum[15];
     });
   });
 }
