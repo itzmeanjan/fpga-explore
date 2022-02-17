@@ -29,17 +29,9 @@ method_4(sycl::queue& q,
       sycl::device_ptr<sycl::uint> in_b_ptr{ in_b };
       sycl::device_ptr<sycl::uint> out_ptr{ out };
 
-      // so that each 32 -bit unsigned integer element can be accessed in
-      // parallel, in stall free manner
-      [[intel::fpga_memory("BLOCK_RAM"),
-        intel::bankwidth(4),
-        intel::numbanks(16)]] sycl::uint loader_a[16];
-      [[intel::fpga_memory("BLOCK_RAM"),
-        intel::bankwidth(4),
-        intel::numbanks(16)]] sycl::uint loader_b[16];
-      [[intel::fpga_memory("BLOCK_RAM"),
-        intel::bankwidth(4),
-        intel::numbanks(16)]] sycl::uint tmp_sum[16];
+      [[intel::fpga_register]] sycl::uint loader_a[16];
+      [[intel::fpga_register]] sycl::uint loader_b[16];
+      [[intel::fpga_register]] sycl::uint tmp_sum[16];
 
 #pragma unroll 16
       for (size_t i = 0; i < 16; i++) {
