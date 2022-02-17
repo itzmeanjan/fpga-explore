@@ -138,14 +138,14 @@ avg 90.9959 ms
 ```bash
 running on pac_s10 : Intel PAC Platform (pac_ee00000)
 
-passed dot_product ( method_4 ) test            in 273.292 ms
-passed dot_product ( method_4 ) test            in 273.289 ms
-passed dot_product ( method_4 ) test            in 273.291 ms
-passed dot_product ( method_4 ) test            in 273.29 ms
-passed dot_product ( method_4 ) test            in 273.292 ms
-passed dot_product ( method_4 ) test            in 273.289 ms
-passed dot_product ( method_4 ) test            in 273.291 ms
-passed dot_product ( method_4 ) test            in 273.292 ms
+passed dot_product ( method_4 ) test            in 2.6575 ms
+passed dot_product ( method_4 ) test            in 2.65284 ms
+passed dot_product ( method_4 ) test            in 2.65324 ms
+passed dot_product ( method_4 ) test            in 2.65008 ms
+passed dot_product ( method_4 ) test            in 2.64978 ms
+passed dot_product ( method_4 ) test            in 2.65143 ms
+passed dot_product ( method_4 ) test            in 2.65097 ms
+passed dot_product ( method_4 ) test            in 2.65042 ms
 
-avg 273.291 ms
+avg 2.65203 ms
 ```
